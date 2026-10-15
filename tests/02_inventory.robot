@@ -56,14 +56,33 @@ INV-006 Products Can Be Sorted By Price High To Low
     Sort Products By    ${SORT_PRICE_DESC}
     Verify Products Sorted By Price    descending=${True}
 
+
 INV-007 User Can View Product Details
     [Documentation]    Verify that product details match the inventory listing.
-    [Tags]    inventory    details
-    ${product_name}=    Set Variable    ${TEST_PRODUCT}
-    ${product_price}=    Get Product Price By Name    ${product_name}
-    Open Product Details    ${product_name}
-    Verify Product Details    ${product_name}    ${product_price}
+    [Tags]    inventory    details    validation
+    ${details}=    Get Inventory Product Details    ${TEST_PRODUCT}
+    Open Product Details    ${TEST_PRODUCT}
+    Verify Product Details Match Inventory    ${details}
 
+INV-008 Back To Products Button Works
+    [Documentation]    Verify navigation from product details back to inventory.
+    [Tags]    inventory    details    navigation
+    Open Product Details    ${TEST_PRODUCT}
+    Return To Inventory
+    Verify Returned To Inventory
+
+INV-009 Add Product To Cart From Details
+    [Documentation]    Verify adding a product from its details page.
+    [Tags]    inventory    details    cart    positive
+    Open Product Details    ${TEST_PRODUCT}
+    Add Product From Details
+
+INV-010 Remove Product From Cart From Details
+    [Documentation]    Verify removing a product from its details page.
+    [Tags]    inventory    details    cart    positive
+    Open Product Details    ${TEST_PRODUCT}
+    Add Product From Details
+    Remove Product From Details
 
 *** Keywords ***
 Open Inventory Page
