@@ -20,7 +20,6 @@ This repository was developed as an SDET technical exercise. Its focus is readab
 - [Reports and debugging](#reports-and-debugging)
 - [Troubleshooting](#troubleshooting)
 - [Version control](#version-control)
-- [Limitations and future improvements](#limitations-and-future-improvements)
 
 ## Technology stack
 
