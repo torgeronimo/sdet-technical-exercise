@@ -15,6 +15,13 @@ ${SORT_DROPDOWN}            css:[data-test="product-sort-container"]
 
 ${PRODUCT_DETAIL_NAME}      css:[data-test="inventory-item-name"]
 ${PRODUCT_DETAIL_PRICE}     css:[data-test="inventory-item-price"]
+${PRODUCT_DETAIL_DESCRIPTION}    css:[data-test="inventory-item-desc"]
+${PRODUCT_DETAIL_IMAGE}          css:.inventory_details_img
+${BACK_TO_PRODUCTS_BUTTON}       id:back-to-products
+${DETAIL_ADD_BUTTON}             css:[data-test^="add-to-cart"]
+${DETAIL_REMOVE_BUTTON}          css:[data-test^="remove"]
+${DETAIL_CART_BADGE}             css:[data-test="shopping-cart-badge"]
+
 
 
 *** Keywords ***
@@ -104,16 +111,77 @@ Open Product Details
     [Documentation]    Opens the details page for a specified product.
     [Arguments]    ${product_name}
     Click Element    xpath://div[contains(@class,"inventory_item_name") and normalize-space(.)="${product_name}"]
-
-Verify Product Details
-    [Documentation]    Verifies product name and price on the details page.
-    [Arguments]    ${expected_name}    ${expected_price}
+    Wait Until Location Contains    inventory-item.html
     Wait Until Element Is Visible    ${PRODUCT_DETAIL_NAME}
-    Element Text Should Be    ${PRODUCT_DETAIL_NAME}    ${expected_name}
-    ${price_text}=    Get Text    ${PRODUCT_DETAIL_PRICE}
-    ${price_text}=    Remove String    ${price_text}    $
-    ${actual_price}=    Convert To Number    ${price_text}
-    Should Be Equal As Numbers    ${actual_price}    ${expected_price}
+
+
+
+    
+Get Inventory Product Details
+    [Documentation]    Captures a product's name, description, price, and image URL.
+    [Arguments]    ${product_name}
+
+    ${product_locator}=    Set Variable    xpath://div[contains(concat(" ", normalize-space(@class), " "), " inventory_item ") and .//div[contains(@class,"inventory_item_name") and normalize-space(.)="${product_name}"]]
+
+    ${name}=    Get Text    ${product_locator}//div[contains(@class,"inventory_item_name")]
+    ${description}=    Get Text    ${product_locator}//div[@class="inventory_item_desc"]
+    ${price}=    Get Text    ${product_locator}//div[contains(@class,"inventory_item_price")]
+    ${image}=    Get Element Attribute    ${product_locator}//img    src
+
+    &{details}=    Create Dictionary
+    ...    name=${name}
+    ...    description=${description}
+    ...    price=${price}
+    ...    image=${image}
+
+    RETURN    ${details}
+
+Verify Product Details Match Inventory
+    [Documentation]    Compares product details against the inventory listing.
+    [Arguments]    ${expected_details}
+
+    Wait Until Location Contains    inventory-item.html
+    Wait Until Element Is Visible    ${PRODUCT_DETAIL_NAME}
+
+    ${actual_name}=    Wait Until Keyword Succeeds    5s    500ms    Get Text    ${PRODUCT_DETAIL_NAME}
+    ${actual_description}=    Get Text    ${PRODUCT_DETAIL_DESCRIPTION}
+    ${actual_price}=    Get Text    ${PRODUCT_DETAIL_PRICE}
+    ${actual_image}=    Get Element Attribute    ${PRODUCT_DETAIL_IMAGE}    src
+
+    Should Be Equal    ${actual_name}    ${expected_details}[name]
+    Should Be Equal    ${actual_description}    ${expected_details}[description]
+    Should Be Equal    ${actual_price}    ${expected_details}[price]
+    Should Be Equal    ${actual_image}    ${expected_details}[image]
+
+    Element Should Be Visible    ${PRODUCT_DETAIL_IMAGE}
+
+
+Return To Inventory
+    [Documentation]    Clicks Back to Products from the details page.
+    Wait Until Element Is Visible    ${BACK_TO_PRODUCTS_BUTTON}
+    Click Button    ${BACK_TO_PRODUCTS_BUTTON}
+
+
+Verify Returned To Inventory
+    [Documentation]    Confirms navigation back to the inventory listing.
+    Wait Until Location Contains    inventory.html
+    Wait Until Element Is Visible    ${INVENTORY_ITEMS}
+
+
+Add Product From Details
+    [Documentation]    Adds a product from its details page and verifies the result.
+    Wait Until Element Is Visible    ${DETAIL_ADD_BUTTON}
+    Wait Until Keyword Succeeds    5s    500ms    Click Button    ${DETAIL_ADD_BUTTON}
+    Wait Until Element Is Visible    ${DETAIL_REMOVE_BUTTON}
+    Element Text Should Be    ${DETAIL_CART_BADGE}    1
+
+
+Remove Product From Details
+    [Documentation]    Removes a product from its details page and verifies the result.
+    Wait Until Element Is Visible    ${DETAIL_REMOVE_BUTTON}
+    Click Button    ${DETAIL_REMOVE_BUTTON}
+    Wait Until Element Is Visible    ${DETAIL_ADD_BUTTON}
+    Wait Until Element Is Not Visible    ${DETAIL_CART_BADGE}
 
 
 Get Product Price By Name
@@ -124,3 +192,4 @@ Get Product Price By Name
     ${price_text}=    Remove String    ${price_text}    $
     ${price}=    Convert To Number    ${price_text}
     RETURN    ${price}
+
