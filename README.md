@@ -244,9 +244,9 @@ The following scenarios are implemented. The project author reports a successful
 
 | Test ID | Test Scenario | Expected Result |
 |---------|---------------|-----------------|
-| CHK-001 | Checkout Requires First Name | An error message is displayed when the first name is missing. |
-| CHK-002 | Checkout Requires Postal Code | An error message is displayed when the postal code is missing. |
-| CHK-003 | Customer Can Complete Checkout | The customer completes the checkout process and receives a successful order confirmation. |
+| CHECKOUT-001 | Checkout Requires First Name | An error message is displayed when the first name is missing. |
+| CHECKOUT-002 | Checkout Requires Postal Code | An error message is displayed when the postal code is missing. |
+| CHECKOUT-003 | Customer Can Complete Checkout | The customer completes the checkout process and receives a successful order confirmation. |
 
 ### Viewing Test Reports
 
